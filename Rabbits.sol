@@ -16,18 +16,12 @@ dev notes:
 */
 
 
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.18;
 // SPDX-License-Identifier: Unlicensed
  
 abstract contract Context {
     function _msgSender() internal view virtual returns (address payable) {
         return payable(msg.sender);
-    }
-
-    function _msgData() internal view virtual returns (bytes memory) {
-        this; // silence state mutability warning without generating bytecode 
-              // - see https://github.com/ethereum/solidity/issues/2691
-        return msg.data;
     }
 }
 
@@ -370,165 +364,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
     ) external;
 }
 
-/**
- * @dev Wrappers over Solidity's arithmetic operations with added overflow
- * checks.
- *
- * Arithmetic operations in Solidity wrap on overflow. This can easily result
- * in bugs, because programmers usually assume that an overflow raises an
- * error, which is the standard behavior in high level programming languages.
- * `SafeMath` restores this intuition by reverting the transaction when an
- * operation overflows.
- *
- * Using this library instead of the unchecked operations eliminates an entire
- * class of bugs, so it's recommended to use it always.
- */
- 
-library SafeMath {
-    /**
-     * @dev Returns the addition of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `+` operator.
-     *
-     * Requirements:
-     *
-     * - Addition cannot overflow.
-     */
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        require(c >= a, "overflow");
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        return sub(a, b, "overflow");
-    }
-
-    /**
-     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
-     * overflow (when the result is negative).
-     *
-     * Counterpart to Solidity's `-` operator.
-     *
-     * Requirements:
-     *
-     * - Subtraction cannot overflow.
-     */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b <= a, errorMessage);
-        uint256 c = a - b;
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the multiplication of two unsigned integers, reverting on
-     * overflow.
-     *
-     * Counterpart to Solidity's `*` operator.
-     *
-     * Requirements:
-     *
-     * - Multiplication cannot overflow.
-     */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
-        // benefit is lost if 'b' is also tested.
-        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
-        if (a == 0) {
-            return 0;
-        }
-
-        uint256 c = a * b;
-        require(c / a == b, "overflow");
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers. Reverts on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        return div(a, b, "zero");
-    }
-
-    /**
-     * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
-     * division by zero. The result is rounded towards zero.
-     *
-     * Counterpart to Solidity's `/` operator. Note: this function uses a
-     * `revert` opcode (which leaves remaining gas untouched) while Solidity
-     * uses an invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b > 0, errorMessage);
-        uint256 c = a / b;
-        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-
-        return c;
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
-        return mod(a, b, "zero");
-    }
-
-    /**
-     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
-     * Reverts with custom message when dividing by zero.
-     *
-     * Counterpart to Solidity's `%` operator. This function uses a `revert`
-     * opcode (which leaves remaining gas untouched) while Solidity uses an
-     * invalid opcode to revert (consuming all remaining gas).
-     *
-     * Requirements:
-     *
-     * - The divisor cannot be zero.
-     */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
-        require(b != 0, errorMessage);
-        return a % b;
-    }
-}
-
 contract Rabbits is Context, IERC20, Ownable {
-    using SafeMath for uint256;
   
     mapping (address => uint256) private _rOwned;
     mapping (address => uint256) private _tOwned;
@@ -536,7 +372,6 @@ contract Rabbits is Context, IERC20, Ownable {
     mapping( address => bool) private _hasSpecialFee; // addresses eligible for special fees
     mapping (address => mapping (address => uint256)) private _allowances;
     mapping (address => bool) private _isExcludedFromReward;  // addresses excluded from reflection rewards
-    mapping( address => uint256) private _lastSaleTimestamp; // timestamp of last sale for jeet detection
     
     address[] private _excludedFromReward; // addresses not eligible for reflection rewards
 
@@ -544,13 +379,15 @@ contract Rabbits is Context, IERC20, Ownable {
    
     uint256 public numTokensToSell = 500000 * 10**6 * 10**9; // 500 billion
     uint256 private constant MAX = ~uint256(0);
-    uint256 private constant _tTotal = 1000000000 * 10**6 * 10**9;  // 1 quadrillion
-    uint256 private constant whaleThreshold = 5000000 * 10**6 * 10**9; // 0.5 trillion
-    uint256 private _rTotal = (MAX - (MAX % _tTotal));
+    uint256 private constant _TTOTAL = 1000000000 * 10**6 * 10**9;  // 1 quadrillion
+    uint256 private constant WHALETHRESHOLD = 5000000 * 10**6 * 10**9; // 0.5 trillion
+    uint256 private constant MAXLIQUIFYAMOUNT = 10000000 * 10**6 * 10**9; // 1 trillion
 
-    string private constant _name = "Rabbits";
-    string private constant _symbol = "RBITS";
-    uint8 private constant _decimals = 9;
+    uint256 private _rTotal = (MAX - (MAX % _TTOTAL));
+
+    string private constant NAME = "Rabbits";
+    string private constant SYMBOL = "RBITS";
+    uint8 private constant DECIMALS = 9;
     
     // initially, high taxes to seed project funds
     uint256 public _taxFee = 0;                    // percentage that is distributed to all holders
@@ -567,12 +404,12 @@ contract Rabbits is Context, IERC20, Ownable {
 
     // target tax rate (5%)
     // tax can be modified but new taxrate must be equal to or less than 5%
-    uint256 private constant _targetFee = 500;
+    uint256 private constant TARGETFEE = 500;
     bool private _transferTaxEnabled = false;
     uint256 public _totalFee = 0;
     
-    IUniswapV2Router02 public uniswapV2Router;
-    address public uniswapV2Pair;
+    IUniswapV2Router02 public immutable uniswapV2Router;
+    address public immutable uniswapV2Pair;
     
     bool private inSwapAndLiquify;
     
@@ -580,6 +417,19 @@ contract Rabbits is Context, IERC20, Ownable {
     bool public swapAndLiquifyMaxAmountEnabled = true;
 
     uint256 private _timeLock = 0;
+
+    event SetFee(address account, uint256 newFee, bool enabled);
+    event SetFees(uint256 newRewardFee, uint256 newLiquidityFee, uint256 newProjectFee, bool transferTax);
+    event SetPlatformFundAddress(address newAddress);
+    event ExcludeFromReward(address addr);
+    event IncludeInReward(address addr);
+    event SetSwapAndLiquifyMaxAmount(uint256 amount);
+    event SetSwapAndLiquifyEnabled(bool swapEnabled, bool maxAmountEnabled);
+    event RescueETH(uint256 amount, address addr);
+    event RescueERC20(uint256 amount, address addr);
+    event RemoveLiquidity(uint256 percentage);
+    event AddInitialLiquidity();
+    event OpenTrading();
 
     modifier lockTheSwap {
         inSwapAndLiquify = true;
@@ -600,7 +450,7 @@ contract Rabbits is Context, IERC20, Ownable {
         // set the rest of the contract variables
         uniswapV2Router = _uniswapV2Router;
        
-        //exclude owner, fund address and this contract from fee and max wallet limit
+        //exclude owner, fund address and this contract from fee
         _hasSpecialFee[ owner() ] = true;
         _hasSpecialFee[ address(this) ] = true;
         _hasSpecialFee[ _platformFundAddress ] = true;
@@ -608,28 +458,28 @@ contract Rabbits is Context, IERC20, Ownable {
         //exclude pair from receiving reflection rewards
         _isExcludedFromReward[ uniswapV2Pair ] = true;
         
-        _totalLiqFee = _liquidityFee.add(_projectFee);
+        _totalLiqFee = _liquidityFee + _projectFee;
         _prevTotalLiqFee = _totalLiqFee;
 
         _timeLock = block.timestamp;
 
-        emit Transfer(address(0), _msgSender(), _tTotal);
+        emit Transfer(address(0), _msgSender(), _TTOTAL);
     }
 
     function name() external pure returns (string memory) {
-        return _name;
+        return NAME;
     }
 
     function symbol() external pure returns (string memory) {
-        return _symbol;
+        return SYMBOL;
     }
 
     function decimals() external pure returns (uint8) {
-        return _decimals;
+        return DECIMALS;
     }
 
     function totalSupply() external pure override returns (uint256) {
-        return _tTotal;
+        return _TTOTAL;
     }
 
     function balanceOf(address account) public view override returns (uint256) {
@@ -653,17 +503,17 @@ contract Rabbits is Context, IERC20, Ownable {
 
     function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount));
+        _approve(sender, _msgSender(), _allowances[sender][_msgSender()] - amount);
         return true;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) external virtual returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender] + addedValue);
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) external virtual returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue));
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender] - subtractedValue);
         return true;
     }
 
@@ -672,7 +522,7 @@ contract Rabbits is Context, IERC20, Ownable {
     }
 
     function reflectionFromToken(uint256 tAmount, bool deductTransferFee) external view returns(uint256) {
-        require(tAmount <= _tTotal);
+        require(tAmount <= _TTOTAL);
         if (!deductTransferFee) {
             (uint256 rAmount,,,,,) = _getValues(tAmount);
             return rAmount;
@@ -685,7 +535,7 @@ contract Rabbits is Context, IERC20, Ownable {
     function tokenFromReflection(uint256 rAmount) public view returns(uint256) {
         require(rAmount <= _rTotal);
         uint256 currentRate = _getRate();
-        return rAmount.div(currentRate);
+        return rAmount / currentRate;
     }
 
     function isFeeForAddressEnabled(address account) external view returns (bool) {
@@ -696,57 +546,40 @@ contract Rabbits is Context, IERC20, Ownable {
         return  _specialFees[ account ];
     }
 
-    function setRouterAddress(address routerAddress) external onlyOwner() {
-        require(address(uniswapV2Router) != routerAddress);
-        IUniswapV2Router02 newRouter = IUniswapV2Router02( routerAddress );
-        // test if pair exists and create if it does not exist
-        address pair = IUniswapV2Factory(newRouter.factory()).getPair(address(this), newRouter.WETH());
-        if (pair == address(0)) {
-            uniswapV2Pair = IUniswapV2Factory(newRouter.factory()).createPair(address(this), newRouter.WETH());
-        }
-        else {
-            uniswapV2Pair = pair;
-        }
-
-        // approve new router to spend contract tokens
-        _approve( address(this), routerAddress, MAX );
-
-        // reset approval of old router
-        _approve( address(this), address(uniswapV2Router), 0);
-
-        // update state
-        uniswapV2Router = IUniswapV2Router02(newRouter);
-    }
-
-    function setPairAddress(address newPair) external onlyOwner() {
-        uniswapV2Pair = newPair;
-    }
-
     function setPlatformFundAddress(address newAddress) external onlyOwner() {
+        require( newAddress != address(0) );
         _platformFundAddress = payable(newAddress);
+
+        emit SetPlatformFundAddress(newAddress);
     }
 
    function setFees(uint256 newRewardFee, uint256 newLiquidityFee, uint256 newProjectFee, bool transferTax) 
      external onlyOwner() {
-        require( (newRewardFee.add(newLiquidityFee).add(newProjectFee)) <= _targetFee); // cannot be more than 5%
+        require( (newRewardFee + newLiquidityFee + newProjectFee) <= TARGETFEE); // cannot be more than 5%
         
         _taxFee = newRewardFee;
         _liquidityFee = newLiquidityFee;
         _projectFee = newProjectFee;
         _transferTaxEnabled = transferTax; // if enabled, tax transfers between wallets
 
-        _totalLiqFee = _liquidityFee.add(_projectFee);
+        _totalLiqFee = _liquidityFee + _projectFee;
+
+        emit SetFees(newRewardFee, newLiquidityFee, newProjectFee, transferTax);
     }
 
     function openTrading() external onlyOwner() {
         swapAndLiquifyEnabled = true;
+
+        emit OpenTrading();
     }
 
     function setFee(address account, uint256 newFee, bool enabled) external onlyOwner {
-        require( newFee <= _targetFee ); // cannot be more than 5%
+        require( newFee <= TARGETFEE ); // cannot be more than 5%
 
         _specialFees[ account ] = newFee;
         _hasSpecialFee[ account ] = enabled;
+
+        emit SetFee(account, newFee, enabled);
     }
 
     function excludeFromReward(address account) external onlyOwner() {
@@ -757,19 +590,24 @@ contract Rabbits is Context, IERC20, Ownable {
         }
         _isExcludedFromReward[account] = true;
         _excludedFromReward.push(account);
+
+        emit ExcludeFromReward(account);
     }
 
     function includeInReward(address account) external onlyOwner() {
         require(_isExcludedFromReward[account]);
         require(_excludedFromReward.length < 100);
-        for (uint256 i = 0; i < _excludedFromReward.length; i++) {
+        uint len = _excludedFromReward.length;
+        for (uint256 i = 0; i < len; i++) {
             if (_excludedFromReward[i] == account) {
-                _excludedFromReward[i] = _excludedFromReward[_excludedFromReward.length - 1];
+                _excludedFromReward[i] = _excludedFromReward[len - 1];
                 uint256 currentRate = _getRate();
-                _rOwned[account] = _tOwned[account].mul(currentRate);
+                _rOwned[account] = _tOwned[account] * currentRate;
                 _tOwned[account] = 0;
                 _isExcludedFromReward[account] = false;
                 _excludedFromReward.pop();
+
+                emit IncludeInReward(account);
                 break;
             }
         }
@@ -778,16 +616,23 @@ contract Rabbits is Context, IERC20, Ownable {
     function setSwapAndLiquifyEnabled(bool swapEnabled, bool maxAmountEnabled) external onlyOwner {
         swapAndLiquifyEnabled = swapEnabled;
         swapAndLiquifyMaxAmountEnabled = maxAmountEnabled;
+
+        emit SetSwapAndLiquifyEnabled(swapAndLiquifyEnabled, swapAndLiquifyMaxAmountEnabled);
     }
 
     function setSwapAndLiquifyMaxAmount(uint256 amount) external onlyOwner {
         require( amount > 0 );
+        require( amount <= MAXLIQUIFYAMOUNT);
         numTokensToSell = amount;
+
+        emit SetSwapAndLiquifyMaxAmount(numTokensToSell);
     }
 
     // contract gains ETH over time
     function rescueETH(uint256 amount) external onlyOwner {
         payable( msg.sender ).transfer(amount);
+
+        emit RescueETH(amount, msg.sender );
     }
 
     // rescue tokens accidently sent to contract address
@@ -801,11 +646,13 @@ contract Rabbits is Context, IERC20, Ownable {
 
         bool success = token.transfer(_msgSender(), amount);
         require(success);
+
+        emit RescueERC20( amount, tokenAddress );
     }
 
     function _reflectFee(uint256 rFee, uint256 tFee) private {
-        _rTotal = _rTotal.sub(rFee);
-        _totalFee = _totalFee.add(tFee);
+        _rTotal = _rTotal - rFee;
+        _totalFee = _totalFee + tFee;
     }
 
     function _getValues(uint256 tAmount) private view returns (uint256, uint256, uint256, uint256, uint256, uint256) {
@@ -815,46 +662,47 @@ contract Rabbits is Context, IERC20, Ownable {
     }
 
     function _getTValues(uint256 tAmount) private view returns (uint256, uint256, uint256) {
-        uint256 tFee = tAmount.mul(_taxFee).div(10**4);
-        uint256 tLiquidity = tAmount.mul(_totalLiqFee).div(10**4);
-        uint256 tTransferAmount = tAmount.sub(tFee).sub(tLiquidity);
+        uint256 tFee = tAmount * _taxFee / (10**4);
+        uint256 tLiquidity = tAmount * _totalLiqFee / (10**4);
+        uint256 tTransferAmount = tAmount - tFee - tLiquidity;
         return (tTransferAmount, tFee, tLiquidity);
     }
 
     function _getRValues(uint256 tAmount, uint256 tFee, uint256 tLiquidity, uint256 currentRate) 
         private pure returns (uint256, uint256, uint256) {
-        uint256 rAmount = tAmount.mul(currentRate);
-        uint256 rFee = tFee.mul(currentRate);
-        uint256 rLiquidity = tLiquidity.mul(currentRate);
-        uint256 rTransferAmount = rAmount.sub(rFee).sub(rLiquidity);
+        uint256 rAmount = tAmount * currentRate;
+        uint256 rFee = tFee * currentRate;
+        uint256 rLiquidity = tLiquidity * currentRate;
+        uint256 rTransferAmount = rAmount - rFee - rLiquidity;
         return (rAmount, rTransferAmount, rFee);
     }
 
     function _getRate() private view returns(uint256) {
         (uint256 rSupply, uint256 tSupply) = _getCurrentSupply();
-        return rSupply.div(tSupply);
+        return rSupply / tSupply;
     }
 
     function _getCurrentSupply() private view returns(uint256, uint256) {
         uint256 rSupply = _rTotal;
-        uint256 tSupply = _tTotal;      
-        for (uint256 i = 0; i < _excludedFromReward.length; i++) {
+        uint256 tSupply = _TTOTAL;
+        uint len = _excludedFromReward.length;
+        for (uint256 i = 0; i < len; i++) {
             if (_rOwned[_excludedFromReward[i]] > rSupply || 
                 _tOwned[_excludedFromReward[i]] > tSupply) 
-                    return (_rTotal, _tTotal);
-            rSupply = rSupply.sub(_rOwned[_excludedFromReward[i]]);
-            tSupply = tSupply.sub(_tOwned[_excludedFromReward[i]]);
+                    return (_rTotal, _TTOTAL);
+            rSupply = rSupply - _rOwned[_excludedFromReward[i]];
+            tSupply = tSupply - _tOwned[_excludedFromReward[i]];
         }
-        if (rSupply < _rTotal.div(_tTotal)) return (_rTotal, _tTotal);
+        if (rSupply < (_rTotal / _TTOTAL)) return (_rTotal, _TTOTAL);
         return (rSupply, tSupply);
     }
     
     function _takeLiquidity(uint256 tLiquidity) private {
         uint256 currentRate = _getRate();
-        uint256 rLiquidity = tLiquidity.mul(currentRate);
-        _rOwned[address(this)] = _rOwned[address(this)].add(rLiquidity);
+        uint256 rLiquidity = tLiquidity * currentRate;
+        _rOwned[address(this)] = _rOwned[address(this)] + rLiquidity;
         if(_isExcludedFromReward[address(this)])
-            _tOwned[address(this)] = _tOwned[address(this)].add(tLiquidity);
+            _tOwned[address(this)] = _tOwned[address(this)] + tLiquidity;
     }
     
     function saveAllFees() private {
@@ -866,7 +714,7 @@ contract Rabbits is Context, IERC20, Ownable {
   
     function setTaxes(address from, address to) private returns (bool) {
         
-        uint256 totalFee = _taxFee.add(_liquidityFee).add(_projectFee);
+        uint256 totalFee = _taxFee + _liquidityFee + _projectFee;
         if( totalFee == 0 ) {
             return false;
         }
@@ -883,8 +731,8 @@ contract Rabbits is Context, IERC20, Ownable {
 
         // if the tax rate is not yet the target tax rate, lock the tax rate on buy
         // this provides a dynamic taxrate to cushion the impact when sniper whales exit
-        if( totalFee > _targetFee && from == uniswapV2Pair && !_hasSpecialFee[to] ) {
-            if( balanceOf(to) >= whaleThreshold ) {
+        if( totalFee > TARGETFEE && from == uniswapV2Pair && !_hasSpecialFee[to] ) {
+            if( balanceOf(to) >= WHALETHRESHOLD ) {
                 _hasSpecialFee[to] = true;
                 _specialFees[to]   = totalFee;
             }
@@ -907,10 +755,10 @@ contract Rabbits is Context, IERC20, Ownable {
         uint256 fee = _specialFees[ lowestFeeAccount ];
         
         // set fees
-        _taxFee = fee.mul(_taxFee).div( totalFee );
-        _liquidityFee = fee.mul(_liquidityFee).div( totalFee );
-        _projectFee = fee.mul(_projectFee).div( totalFee );
-        _totalLiqFee = _liquidityFee.add(_projectFee);
+        _taxFee = fee * _taxFee / totalFee;
+        _liquidityFee = fee * _liquidityFee / totalFee;
+        _projectFee = fee * _projectFee / totalFee;
+        _totalLiqFee = _liquidityFee + _projectFee;
 
         return true;
     }
@@ -933,12 +781,12 @@ contract Rabbits is Context, IERC20, Ownable {
         }
     }
  
-    function _approve(address owner, address spender, uint256 amount) private {
-        require(owner != address(0) );
+    function _approve(address addr, address spender, uint256 amount) private {
+        require(addr != address(0) );
         require(spender != address(0) );
 
-        _allowances[owner][spender] = amount;
-        emit Approval(owner, spender, amount);
+        _allowances[addr][spender] = amount;
+        emit Approval(addr, spender, amount);
     }
 
     function _transfer(
@@ -949,7 +797,6 @@ contract Rabbits is Context, IERC20, Ownable {
         require(from != address(0));
         require(to != address(0));
         require(amount <= balanceOf(from));
-        require(amount >= 0);
 
         uint256 contractTokenBalance = balanceOf(address(this));
         bool overMinTokenBalance = contractTokenBalance > numTokensToSell;
@@ -985,19 +832,19 @@ contract Rabbits is Context, IERC20, Ownable {
     }
 
     function swapAndLiquify(uint256 tAmount) private lockTheSwap {
-        uint256 forLiquidity = tAmount.mul(_liquidityFee).div(_totalLiqFee);
-        uint256 forWallets = tAmount.sub(forLiquidity);
+        uint256 forLiquidity = tAmount * _liquidityFee / _totalLiqFee;
+        uint256 forWallets = tAmount - forLiquidity;
         
         if(forLiquidity > 0 && _liquidityFee > 0)
         {
             // sell half the tokens for ETH and add liquidity
-            uint256 half = forLiquidity.div(2);
-            uint256 otherHalf = forLiquidity.sub(half);
+            uint256 half = forLiquidity / 2;
+            uint256 otherHalf = forLiquidity - half;
     
             uint256 initialBalance = address(this).balance;
             swapTokensForETH(half);
 
-            uint256 newBalance = address(this).balance.sub(initialBalance);
+            uint256 newBalance = address(this).balance - initialBalance;
             addLiquidity(otherHalf, newBalance);
         }
                 
@@ -1007,7 +854,7 @@ contract Rabbits is Context, IERC20, Ownable {
             uint256 initialBalance = address(this).balance;
             swapTokensForETH(forWallets);
 
-            uint256 newBalance = address(this).balance.sub(initialBalance);
+            uint256 newBalance = address(this).balance - initialBalance;
             
             _platformFundAddress.transfer(newBalance);
         }
@@ -1033,7 +880,8 @@ contract Rabbits is Context, IERC20, Ownable {
         );
     }
 
-    // remove at most 10% of the liquidity tokens in the contract and then put a time lock of 4 weeks
+    // remove at most 10% of the liquidity tokens in the contract and each withdrawal triggers
+    // an automatic 4-week time lock.
     // this does not impact initial liquidity
     function removeLiquidity(uint256 percentage) external onlyOwner lockTheSwap {
         require(_timeLock <= block.timestamp);
@@ -1042,14 +890,16 @@ contract Rabbits is Context, IERC20, Ownable {
         uint256 liquidity = IERC20(uniswapV2Pair).balanceOf(address(this));
         require( liquidity > 0);
 
-        uint256 amount = liquidity.mul(percentage).div(10**4); // at most 10% 
+        uint256 amount = liquidity * percentage / (10**4); // at most 10%
         
         IERC20(uniswapV2Pair).approve(address(uniswapV2Router), amount);
         uniswapV2Router.removeLiquidityETHSupportingFeeOnTransferTokens(
-            address(this), amount, 0, 0, msg.sender, block.timestamp.add(60) );
+            address(this), amount, 0, 0, msg.sender, block.timestamp + 60 );
 
         // set a new timed lock
         _timeLock = block.timestamp + (4 weeks);
+
+        emit RemoveLiquidity(percentage);
     }
 
     // function that generates LP tokens from taxes
@@ -1084,6 +934,7 @@ contract Rabbits is Context, IERC20, Ownable {
             block.timestamp
         );
         
+        emit AddInitialLiquidity();
     }
 
     //this method is responsible for taking all fee
@@ -1102,8 +953,8 @@ contract Rabbits is Context, IERC20, Ownable {
     function _transferStandard(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, 
          uint256 tTransferAmount, uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);
+        _rOwned[sender] = _rOwned[sender] - rAmount;
+        _rOwned[recipient] = _rOwned[recipient] + rTransferAmount;
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
@@ -1112,9 +963,9 @@ contract Rabbits is Context, IERC20, Ownable {
     function _transferToExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount, 
          uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);           
+        _rOwned[sender] = _rOwned[sender] - rAmount;
+        _tOwned[recipient] = _tOwned[recipient] + tTransferAmount;
+        _rOwned[recipient] = _rOwned[recipient] + rTransferAmount;
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
@@ -1123,9 +974,9 @@ contract Rabbits is Context, IERC20, Ownable {
     function _transferFromExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount,
          uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
-        _tOwned[sender] = _tOwned[sender].sub(tAmount);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);   
+        _tOwned[sender] = _tOwned[sender] - tAmount;
+        _rOwned[sender] = _rOwned[sender] - rAmount;
+        _rOwned[recipient] = _rOwned[recipient] + rTransferAmount;
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
@@ -1134,10 +985,10 @@ contract Rabbits is Context, IERC20, Ownable {
     function _transferBothExcluded(address sender, address recipient, uint256 tAmount) private {
         (uint256 rAmount, uint256 rTransferAmount, uint256 rFee, uint256 tTransferAmount,
          uint256 tFee, uint256 tLiquidity) = _getValues(tAmount);
-        _tOwned[sender] = _tOwned[sender].sub(tAmount);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _tOwned[recipient] = _tOwned[recipient].add(tTransferAmount);
-        _rOwned[recipient] = _rOwned[recipient].add(rTransferAmount);        
+        _tOwned[sender] = _tOwned[sender] - tAmount;
+        _rOwned[sender] = _rOwned[sender] - rAmount;
+        _tOwned[recipient] = _tOwned[recipient] + tTransferAmount;
+        _rOwned[recipient] = _rOwned[recipient] + rTransferAmount;
         _takeLiquidity(tLiquidity);
         _reflectFee(rFee, tFee);
         emit Transfer(sender, recipient, tTransferAmount);
