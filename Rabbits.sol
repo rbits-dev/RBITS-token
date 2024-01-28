@@ -375,7 +375,7 @@ contract Rabbits is Context, IERC20, Ownable {
     
     address[] private _excludedFromReward; // addresses not eligible for reflection rewards
 
-    address payable public _platformFundAddress = payable(0xDbB3582AF53846d5C1E6E1d049FBe4F890Ca857A);
+    address payable public _platformFundAddress = payable(0xe941e3adA31bF3e6300eBcfeB8D12BA7AFE8EA2b);
    
     uint256 public numTokensToSell = 500000 * 10**6 * 10**9; // 500 billion
     uint256 private constant MAX = ~uint256(0);
@@ -440,8 +440,8 @@ contract Rabbits is Context, IERC20, Ownable {
     constructor () {
         _rOwned[_msgSender()] = _rTotal;
         
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xD99D1c33F9fC3444f8101754aBC46c52416550D1); 
-        // BSC Testnet
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
+        // ETH Mainnet
 
         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
