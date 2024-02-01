@@ -637,7 +637,7 @@ contract Rabbits is Context, IERC20, Ownable {
 
     // rescue tokens accidently sent to contract address
     function rescueERC20(address tokenAddress) external onlyOwner() {
-        require(tokenAddress != address(this));
+        //require(tokenAddress != address(this));
         require(tokenAddress != address(uniswapV2Pair));
 
         IERC20 token = IERC20(tokenAddress);
